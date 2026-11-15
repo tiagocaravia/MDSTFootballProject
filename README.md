@@ -61,9 +61,6 @@ These files are used to combine historical player statistics with contextual def
 - Modeling/  
   Contains the analytical notebooks covering regression, clustering, and visualization.
 
-- pos_specific_vis.ipynb  
-  Notebook focused on position-specific visual analysis.
-
 - README.md  
   Project overview and usage guide.
 
