@@ -1,140 +1,58 @@
 # MDST Football Project
 
-A data-driven football analytics project focused on fantasy football value estimation, player performance analysis, and predictive modeling. This repository consolidates NFL player stat data, team defense data, and analytical notebooks to evaluate how usage patterns, efficiency metrics, and team context influence fantasy production.
+How much of a player's fantasy football production comes from opportunity (targets, carries, pass attempts) — and can last season's opportunity predict next season's points?
 
-## Project Overview
+This project models PPR fantasy points per game for NFL QBs, RBs, WRs and TEs using 2024–2025 season data, tests how well those models actually forecast the following year, and projects 2026 top 10s at each position.
 
-This project was designed to explore how football statistics can be transformed into actionable insights for fantasy analysis. The work combines data preparation, exploratory analysis, and predictive modeling to study player performance across multiple seasons.
+Built as a project with the Michigan Data Science Team (MDST) at the University of Michigan.
 
-The analysis emphasizes the four fantasy-relevant positions:
+## Key findings
 
-- Quarterback (QB)
-- Running Back (RB)
-- Wide Receiver (WR)
-- Tight End (TE)
+- **Usage explains a season well.** Linear regression on per-game usage explains most of the variation in same-season fantasy output: R² of 0.93 for RBs, 0.83 for WRs and 0.53 for QBs on held-out data.
+- **But it forecasts next season only moderately.** Fit on 2024 and projecting 2025, the model picked **18 of 40** actual top-10 players across the four positions, versus 20 of 40 for a naive "same as last year" baseline. It had lower per-game error than the baseline at QB, WR and TE.
+- **Predictability varies a lot by position.** Year-to-year correlation in PPR points per game is 0.65 for RBs and 0.64 for WRs, but only 0.40 for QBs and 0.30 for TEs.
+- **QB volume misleads.** Attempts-based QB projections overrate high-volume and rushing QBs and miss efficient pocket passers, pointing to efficiency stats as the next feature to add.
+- **Role changes drive breakouts and fall-offs.** K-means groups of 2024 vs. 2025 scoring show that at every position, breakout players gained opportunities per game and fall-off players lost them, and fall-offs skewed older at QB, WR and TE.
+- **Most forecast misses are unmodeled events:** injuries, team changes, role breakouts and rookies with no prior season.
 
-The underlying objective is to quantify which factors most strongly correlate with fantasy output and to assess whether these signals can be used for predictive modeling and player segmentation.
+## Notebooks
 
-## Core Objectives
+| Notebook | What it does |
+|---|---|
+| [`Modeling/linear_regression.ipynb`](Modeling/linear_regression.ipynb) | Fits overall and position-specific regressions of PPR/game on usage features; flags "buy-low" WRs who underperformed their target volume. |
+| [`Modeling/top10_projections.ipynb`](Modeling/top10_projections.ipynb) | Backtests the regressions (2024 → 2025 top 10s) against a naive baseline, then projects 2026 top 10s from combined 2024–2025 usage. |
+| [`Modeling/k_means.ipynb`](Modeling/k_means.ipynb) | Year-to-year analysis (next-season R², persistence, aging curves), plus k-means clustering of players into High-High, High-Low, Low-High and Low-Low groups by 2024 vs. 2025 PPR/game to see what separates breakouts from fall-offs. |
+| [`Modeling/def_modeling.ipynb`](Modeling/def_modeling.ipynb) | Team-level model: whether plays faced by a team's defense predict that team's total player fantasy points. |
+| [`Modeling/Plots_Visuals.ipynb`](Modeling/Plots_Visuals.ipynb) | Exploratory correlation heatmaps across all fantasy stats. |
+| [`DataSets/CombineData.ipynb`](DataSets/CombineData.ipynb) | Merges the raw 2024 and 2025 passing, rushing, receiving and defense tables into the combined datasets. |
 
-- Clean and combine raw football datasets into a usable analytical foundation
-- Evaluate fantasy-relevant player performance across seasons
-- Identify the strongest drivers of fantasy production
-- Build and compare predictive modeling approaches
-- Explore player clustering and positional usage patterns
-- Produce visual and analytical outputs suitable for portfolio presentation
+## Methods
 
-## What This Project Includes
+- **Data prep:** merged per-season passing, rushing and receiving stats into one player-season table (2024–2025); deduplicated traded players; filled missing counting stats with 0 while leaving rate stats missing.
+- **Feature engineering:** per-game usage rates (targets, rush attempts, pass attempts, touchdowns), with minimum-play thresholds by position (QB 200, RB 100, WR 40, TE 30) to filter out low-volume noise.
+- **Modeling:** scikit-learn linear regression with position-specific feature sets, evaluated on held-out data and with an out-of-sample year-ahead backtest against a naive baseline.
+- **Evaluation:** R², mean absolute error, Spearman rank correlation and top-10 hit rate.
 
-- Data aggregation and preparation from multiple CSV sources
-- Exploratory analysis of player and team performance
-- Feature engineering based on targets, carries, passing attempts, and efficiency metrics
-- Linear regression for fantasy output prediction
-- K-means clustering analysis for player grouping and pattern detection
-- Visual analytics for performance trends and relationship exploration
+## Data
 
-## Technical Stack
+Player and team stats come from [Pro Football Reference](https://www.pro-football-reference.com/) (Sports Reference). `DataSets/` holds the combined player stats (`FantasyData.csv`), season PPR totals (`2024FantasyPPR.csv`, `2025FantasyPPR.csv`) and team defense stats (`DefenseData.csv`) for the 2024 and 2025 NFL seasons.
 
-- Python
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-- scikit-learn
-- Jupyter Notebook
-
-## Data Sources
-
-The repository includes structured datasets stored in the DataSets directory, including:
-
-- Fantasy player performance data
-- Team defense statistics
-- Multi-season fantasy scoring data
-
-These files are used to combine historical player statistics with contextual defensive metrics to study the relationship between usage, efficiency, and fantasy value.
-
-## Repository Structure
-
-- DataSets/  
-  Contains the cleaned and raw football datasets used in the analysis.
-
-- Modeling/  
-  Contains the analytical notebooks covering regression, clustering, and visualization.
-
-- README.md  
-  Project overview and usage guide.
-
-## Modeling Approach
-
-The project applies a combination of statistical and machine learning methods:
-
-- Linear regression to estimate fantasy production using usage-based features
-- Feature engineering around metrics such as targets per game, rushing attempts per game, passing attempts per game, and touchdown opportunities
-- Player filtering based on minimum usage thresholds to reduce noise from low-volume performers
-- K-means analysis to group players by similar performance profiles
-- Visual diagnostics to interpret model behavior and feature relationships
-
-## Key Analytical Focus Areas
-
-- Fantasy output prediction for QB, RB, WR, and TE players
-- Efficiency versus volume tradeoffs
-- Correlation between team defense context and fantasy results
-- Identification of high-value usage patterns
-- Positional evaluation and segmentation of player archetypes
-
-## Environment Setup
-
-To run the notebooks locally, use a Python environment with the required dependencies installed.
-
-1. Create and activate a virtual environment
-2. Install dependencies
-3. Launch Jupyter Notebook or JupyterLab
-
-Example:
+## Running it
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install pandas numpy matplotlib seaborn scikit-learn jupyterlab
+pip install pandas numpy scipy matplotlib seaborn scikit-learn jupyterlab
 jupyter lab
 ```
 
-## Usage
+Run notebooks from the repository root so the `DataSets/` paths resolve.
 
-Open the notebooks in the Modeling folder to reproduce the analysis:
+## Next steps
 
-- linear_regression.ipynb
-- k_means.ipynb
-- def_modeling.ipynb
-- Plots_Visuals.ipynb
+- Add efficiency features (yards per attempt, yards per target, TD rate), especially for QBs.
+- Use more seasons of history, weighting recent seasons more heavily.
+- Add age and injury history, and replace touchdowns with red-zone opportunities.
+- Score the 2026 projections once the season's data is available.
 
-Each notebook is structured to progressively move from data preparation to exploratory analysis and modeling.
-
-## Project Significance
-
-This project demonstrates practical skills in:
-
-- Data cleaning and feature engineering
-- Exploratory data analysis
-- Statistical modeling
-- Machine learning application in sports analytics
-- Data storytelling through visualization
-- Translating raw sports data into interpretable business and analytical insights
-
-These are valuable capabilities for roles in data analysis, analytics engineering, quantitative research, and data science.
-
-## Future Enhancements
-
-Potential next steps for expanding the project include:
-
-- Incorporating additional seasons and more complete historical datasets
-- Comparing multiple model families, including tree-based methods and ensemble approaches
-- Building a reusable forecasting workflow for future player valuation
-- Creating a dashboard for interactive fantasy analysis
-- Expanding the dataset to include advanced efficiency and opportunity metrics
-
-## Conclusion
-
-The MDST Football Project brings together sports data, statistical modeling, and data visualization to provide a professional analytics workflow grounded in real-world NFL performance data. It is designed to highlight both analytical depth and practical decision-making ability in a way that is relevant to modern data-focused roles.
-
-This repository reflects a strong foundation in Python-based analytics, statistical reasoning, and applied machine learning, making it suitable for technical discussion in interviews, portfolio reviews, and professional presentations.
+**Tools:** Python, pandas, NumPy, scikit-learn, SciPy, Matplotlib, seaborn, Jupyter
