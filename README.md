@@ -104,6 +104,7 @@ jupyter lab
 Open the notebooks in the Modeling folder to reproduce the analysis:
 
 - linear_regression.ipynb
+- top10_projections.ipynb
 - k_means.ipynb
 - def_modeling.ipynb
 - Plots_Visuals.ipynb
