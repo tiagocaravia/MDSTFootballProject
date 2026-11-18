@@ -4,6 +4,8 @@ How much of a player's fantasy football production comes from opportunity (targe
 
 This project models PPR fantasy points per game for NFL QBs, RBs, WRs and TEs using 2024–2025 season data, tests how well those models actually forecast the following year, and projects 2026 top 10s at each position.
 
+Built as a project with the Michigan Data Science Team (MDST) at the University of Michigan.
+
 ## Key findings
 
 - **Usage explains a season well.** Linear regression on per-game usage explains most of the variation in same-season fantasy output: R² of 0.93 for RBs, 0.83 for WRs and 0.53 for QBs on held-out data.
@@ -32,7 +34,7 @@ This project models PPR fantasy points per game for NFL QBs, RBs, WRs and TEs us
 
 ## Data
 
-`DataSets/` holds the combined player stats (`FantasyData.csv`), season PPR totals (`2024FantasyPPR.csv`, `2025FantasyPPR.csv`) and team defense stats (`DefenseData.csv`) for the 2024 and 2025 NFL seasons.
+Player and team stats come from [Pro Football Reference](https://www.pro-football-reference.com/) (Sports Reference). `DataSets/` holds the combined player stats (`FantasyData.csv`), season PPR totals (`2024FantasyPPR.csv`, `2025FantasyPPR.csv`) and team defense stats (`DefenseData.csv`) for the 2024 and 2025 NFL seasons.
 
 ## Running it
 
